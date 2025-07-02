@@ -57,6 +57,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       static_cast<const DetectorConstruction*>(G4RunManager::GetRunManager()->GetUserDetectorConstruction());
     fScoringVolume = detConstruction->GetScoringVolume();
     fTargetCenter = detConstruction->GetTargetCenter();
+    G4cout<<"HEKKI";
     fTargetVolume = detConstruction->GetTargetVolume();
   }
 
