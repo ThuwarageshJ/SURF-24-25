@@ -1,0 +1,2 @@
+Total muons: 0
+Total background: 0

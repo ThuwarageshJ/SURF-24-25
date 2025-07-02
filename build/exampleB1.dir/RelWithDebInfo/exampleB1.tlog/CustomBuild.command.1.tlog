@@ -1,0 +1,10 @@
+^C:\USERS\THUWA\GEANT4\GEANT4-V11.3.2\PROGRAM_FILES\SHARE\GEANT4\EXAMPLES\BASIC\B1_W\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/thuwa/Geant4/geant4-v11.3.2/program_files/share/Geant4/examples/basic/B1_W -BC:/Users/thuwa/Geant4/geant4-v11.3.2/program_files/share/Geant4/examples/basic/B1_W/build --check-stamp-file C:/Users/thuwa/Geant4/geant4-v11.3.2/program_files/share/Geant4/examples/basic/B1_W/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
