@@ -58,7 +58,6 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     fScoringVolume = detConstruction->GetScoringVolume();
     fTargetCenter = detConstruction->GetTargetCenter();
     fTargetVolume = detConstruction->GetTargetVolume();
-    G4cout<<"HI";
   }
 
 
