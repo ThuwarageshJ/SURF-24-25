@@ -26,6 +26,8 @@ class SensitiveDetector : public G4VSensitiveDetector
         static int backgroundCount;
         static int currentRun;
         static void ResetCounters();
+        G4bool firstTrack=false;
+        G4int curtrackID = -1;
 };
 }
 #endif

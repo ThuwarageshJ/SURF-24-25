@@ -214,12 +214,6 @@ void RunAction::EndOfRunAction(const G4Run* run)
 
   G4AnalysisManager *man = G4AnalysisManager::Instance();
 
-
-  std::ofstream summary("summary.txt");
-  summary << "Total muons: " << SensitiveDetector::muonCount << "\n";
-  summary << "Total background: " << SensitiveDetector::backgroundCount << "\n";
-  summary.close();
-
   SensitiveDetector::allHits.clear();
   man->Write();
   man->CloseFile();

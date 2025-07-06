@@ -53,13 +53,13 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     G4LogicalVolume* GetTargetVolume() const { return fTargetVolume; }
     G4ThreeVector GetTargetCenter() const {return fTargetCenter;}
 
+
     virtual void ConstructSDandField();
 
   protected:
     G4LogicalVolume* fScoringVolume = nullptr;
     G4LogicalVolume* fTargetVolume = nullptr;
     G4ThreeVector fTargetCenter = G4ThreeVector();
-
 
 };
 

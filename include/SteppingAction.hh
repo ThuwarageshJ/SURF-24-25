@@ -51,14 +51,16 @@ class SteppingAction : public G4UserSteppingAction
 
     // method from the base class
     void UserSteppingAction(const G4Step*) override;
+    void StoreData(const G4Step*, G4LogicalVolume*);
 
   private:
     EventAction* fEventAction = nullptr;
     G4LogicalVolume* fScoringVolume = nullptr;
     G4ThreeVector fTargetCenter;
     G4LogicalVolume* fTargetVolume = nullptr;
-    G4bool fPrimary = false;
+    G4bool fPrimaryStored = false;
     G4int fLastEventID = -1;
+    G4double fTargetHalfZLength;
 
 };  // namespace B1
 }

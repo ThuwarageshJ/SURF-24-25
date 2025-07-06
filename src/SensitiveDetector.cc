@@ -50,9 +50,35 @@ G4bool SensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
     // hit.edep = edep;
     // hit.pid = pid;
     // allHits.push_back(hit);
-    // if (abs(pid)==13){
-    // G4cout <<" Particle name: " << particleName << " Pos: "<<hit.x<<" "<<hit.y<<" "<<hit.z<<" "<<hit.edep<<" Process: "<<aProcess<<G4endl;
+
+    // G4int curtrack = step->GetTrack()->GetTrackID();
+    // if (particleName == "gamma"){
+    //     if(curtrackID==curtrack){
+    //         G4cout<<"PREVIOUS PARTICLE "<<curtrack<<G4endl;
+    //         G4cout <<" Particle name: " << particleName << " Pos: "<<hit.x<<" "<<hit.y<<" "<<hit.z<<" "<<hit.edep<<" Process: "<<aProcess<<G4endl;
+    //         G4ThreeVector postPos = postStepPoint->GetPosition();
+    //         G4cout << "  PostStep Pos: " << postPos.x() << " " << postPos.y() << " " << postPos.z() << G4endl;
+
+            
+    //     }else{
+    //         G4cout<<" NEWWW"<<curtrack<<G4endl;
+    //         G4cout <<" Particle name: " << particleName << " Pos: "<<hit.x<<" "<<hit.y<<" "<<hit.z<<" "<<hit.edep<<" Process: "<<aProcess<<G4endl;
+    //         G4ThreeVector postPos = postStepPoint->GetPosition();
+    //         G4cout << "  PostStep Pos: " << postPos.x() << " " << postPos.y() << " " << postPos.z() << G4endl;
+    //         curtrackID = curtrack;
+    //     }
     // }
+    // if(curtrackID!=curtrack){
+    //     curtrackID = 
+    // }
+    
+    
+    //firstTrack = true;
+
+    
+
+
+    
 
     // if (abs(pid) == 13) muonCount++;
     // else backgroundCount++;

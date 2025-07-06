@@ -105,20 +105,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // Tungsten Target
   //
   G4Material* target_mat = nist->FindOrBuildMaterial("G4_W");
-  G4ThreeVector pos_target = G4ThreeVector(0, 0 * cm, 10 * cm);
+  G4ThreeVector pos_target = G4ThreeVector(0* cm, 0 * cm, 10 * cm);
 
   // Cubical section shape
   G4double targetXY = 10 * cm;
   G4double targetZ = 10* cm;
-
   
   auto solidTarget = new G4Box("Target", 0.5*targetXY, 0.5*targetXY, 0.5*targetZ);
-  // auto solidTarget = new G4Tubs("Target",
-  //                 0*cm,
-  //                 1.25*cm,
-  //                 2*cm,
-  //                 0.*deg,
-  //                 360.*deg);
+
 
   auto logicTarget = new G4LogicalVolume(solidTarget,  // its solid
                                          target_mat,  // its material
@@ -137,70 +131,35 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //
   // Detector
   //
-  G4Material* detector_mat = nist->FindOrBuildMaterial("G4_Galactic");
+  // G4Material* detector_mat = nist->FindOrBuildMaterial("G4_Galactic");
 
-  G4int Ndetectors = 100;
-  // Detector shape
-  G4double detectorXY = env_sizeXY/Ndetectors;  // Size of each detector cell
-  G4double detectorZ = 25 * um;  // Thickness of the detector
-  auto solidDetector = new G4Box("Detector", 0.5 * detectorXY, 0.5 * detectorXY, 0.5 * detectorZ);
+  // G4int Ndetectors = 100;
+  // // Detector shape
+  // G4double detectorXY = env_sizeXY/Ndetectors;  // Size of each detector cell
+  // G4double detectorZ = 25 * um;  // Thickness of the detector
+  // auto solidDetector = new G4Box("Detector", 0.5 * detectorXY, 0.5 * detectorXY, 0.5 * detectorZ);
 
-  G4LogicalVolume *logicDetector = new G4LogicalVolume(solidDetector,  // its solid
-                                         detector_mat,  // its material
-                                         "Detector");  // its name
+  // G4LogicalVolume *logicDetector = new G4LogicalVolume(solidDetector,  // its solid
+  //                                        detector_mat,  // its material
+  //                                        "Detector");  // its name
 
   
-  for(G4int i=0; i<Ndetectors;i++){
-    for(G4int j=0; j<Ndetectors; j++){
-      G4double x = (i - Ndetectors/2 +0.5) * detectorXY;
-      G4double y = (j - Ndetectors/2 + 0.5) * detectorXY;
-      G4ThreeVector pos = G4ThreeVector(x, y, (env_sizeZ-detectorZ)/2);
-      auto physDetectorCell = new G4PVPlacement(nullptr,  // no rotation
-                                                pos,  // at position
-                                                logicDetector,  // its logical volume
-                                                "DetectorCell",  // its name
-                                                logicEnv,  // its mother volume
-                                                false,  // no boolean operation
-                                                i*100 + j,  // copy number
-                                                checkOverlaps);  // overlaps checking
-    };
-  };                                     
+  // for(G4int i=0; i<Ndetectors;i++){
+  //   for(G4int j=0; j<Ndetectors; j++){
+  //     G4double x = (i - Ndetectors/2 +0.5) * detectorXY;
+  //     G4double y = (j - Ndetectors/2 + 0.5) * detectorXY;
+  //     G4ThreeVector pos = G4ThreeVector(x, y, (env_sizeZ-detectorZ)/2);
+  //     auto physDetectorCell = new G4PVPlacement(nullptr,  // no rotation
+  //                                               pos,  // at position
+  //                                               logicDetector,  // its logical volume
+  //                                               "DetectorCell",  // its name
+  //                                               logicEnv,  // its mother volume
+  //                                               false,  // no boolean operation
+  //                                               i*100 + j,  // copy number
+  //                                               checkOverlaps);  // overlaps checking
+  //   };
+  // };                                     
   
-  // auto physDetector = new G4PVPlacement(nullptr,  // no rotation
-  //                   pos_detector,  // at position
-  //                   logicDetector,  // its logical volume
-  //                   "Detector",  // its name
-  //                   logicWorld,  // its mother  volume
-  //                   false,  // no boolean operation
-  //                   0,  // copy number
-  //                   checkOverlaps);  // overlaps checking
-  //
-  // Shape 2
-  //
-  // G4Material* shape2_mat = nist->FindOrBuildMaterial("G4_WATER");
-  // G4ThreeVector pos2 = G4ThreeVector(0, 0 * cm, 0 * cm);
-
-  // // Trapezoid shape
-  // G4double shape2_dxa = 12 * cm, shape2_dxb = 12 * cm;
-  // G4double shape2_dya = 10 * cm, shape2_dyb = 16 * cm;
-  // G4double shape2_dz = 6 * cm;
-  // auto solidShape2 =
-  //   new G4Trd("Shape2",  // its name
-  //             0.5 * shape2_dxa, 0.5 * shape2_dxb, 0.5 * shape2_dya, 0.5 * shape2_dyb,
-  //             0.5 * shape2_dz);  // its size
-
-  // auto logicShape2 = new G4LogicalVolume(solidShape2,  // its solid
-  //                                        shape2_mat,  // its material
-  //                                        "Shape2");  // its name
-
-  // new G4PVPlacement(nullptr,  // no rotation
-  //                   pos2,  // at position
-  //                   logicShape2,  // its logical volume
-  //                   "Shape2",  // its name
-  //                   logicEnv,  // its mother  volume
-  //                   false,  // no boolean operation
-  //                   0,  // copy number
-  //                   checkOverlaps);  // overlaps checking
 
   // // Set Shape2 as scoring volume
   // //
@@ -219,12 +178,8 @@ void DetectorConstruction::ConstructSDandField()
   //
   SensitiveDetector *SD = new SensitiveDetector("SensitiveDetector");
   
-  SetSensitiveDetector("Detector", SD, true);
+  SetSensitiveDetector("Target", SD, true);
 
-
-  // Field
-  //
-  // G4AutoDelete::Register(new FieldSetup());
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
