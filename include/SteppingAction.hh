@@ -51,7 +51,7 @@ class SteppingAction : public G4UserSteppingAction
 
     // method from the base class
     void UserSteppingAction(const G4Step*) override;
-    void StoreData(const G4Step*, G4LogicalVolume*);
+    void StoreData(const G4Step*, G4LogicalVolume*, G4int);
 
   private:
     EventAction* fEventAction = nullptr;

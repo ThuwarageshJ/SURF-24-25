@@ -104,6 +104,7 @@ void RunAction::BeginOfRunAction(const G4Run* run)
 
   man->CreateNtuple("Particles", "Particles");
   man->CreateNtupleIColumn("fEventID");
+  man->CreateNtupleIColumn("fTrackID");
   man->CreateNtupleSColumn("fParticleName");
   man->CreateNtupleIColumn("fPID");
   man->CreateNtupleFColumn("fParticleMass");
@@ -125,7 +126,7 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   man->CreateNtupleFColumn("fKE");
   man->CreateNtupleFColumn("fTheta");
   man->CreateNtupleFColumn("fPhi");
-  
+  man->CreateNtupleSColumn("fType");
   man->FinishNtuple(0);
 
   man->CreateNtuple("Primaries", "Primaries");
@@ -151,6 +152,8 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   man->CreateNtupleFColumn(1, "fPz_hit");
   man->CreateNtupleFColumn(1, "fKE_hit");
   man->FinishNtuple(1);
+
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

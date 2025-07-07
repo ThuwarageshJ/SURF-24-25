@@ -119,7 +119,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   else if (volume==fTargetVolume && (abs(particlePID)==13 || abs(particlePID)==211))
   // You're in target volume, and it's either a muon or a pion
   { 
-    StoreData(step, volume);
+    StoreData(step, volume, 0);
   }
   else if (volume==fScoringVolume && preStepPoint->GetStepStatus() == fGeomBoundary)
   // in scoring volume.
@@ -130,17 +130,18 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     if(prePos_TC.z()==fTargetHalfZLength) 
     // Store only particles coming out through rear face.
     { 
-      StoreData(step, volume);
+      StoreData(step, volume, 1);
     }  
   }
 }
 
-void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume)
+void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume, G4int type)
 { 
   G4AnalysisManager *man = G4AnalysisManager::Instance();
 
   auto track = step->GetTrack();
   auto trackstatus = track->GetTrackStatus();
+  auto trackID = track->GetTrackID();
   auto particleDef = track->GetDefinition();
   auto particlePID = particleDef->GetPDGEncoding();
   auto particleName = particleDef->GetParticleName();
@@ -165,9 +166,13 @@ void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume)
   auto restMass = particleDef->GetPDGMass();
 
   G4int eventID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
-      
+  
+  auto process_type = (type==1 ? "outgoing": "intarget");
+  if(trackstatus == fStopAndKill && type==0){process_type = "kill";}
+  
   G4int hid = 0;
   man->FillNtupleIColumn(hid, eventID);
+  man->FillNtupleIColumn(++hid, trackID);
   man->FillNtupleSColumn(++hid, particleName);
   man->FillNtupleIColumn(++hid, particlePID);
   man->FillNtupleFColumn(++hid, restMass);
@@ -189,22 +194,19 @@ void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume)
   man->FillNtupleFColumn(++hid, kineticEnergy);
   man->FillNtupleFColumn(++hid, theta);
   man->FillNtupleFColumn(++hid, phi);
+  man->FillNtupleSColumn(++hid, process_type);
   man->AddNtupleRow(0);
 
-  if(volume==fTargetVolume){
-  G4cout << "EventID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID() << G4endl;
-  G4cout << "Particle: " << particleName << " (PID: " << particlePID << ")" << G4endl;
-  //G4cout << "Rest mass: " << restMass << G4endl;
-  G4cout << "Pre-step position: " << prePos << " (TC: " << prePos_TC << ")" << G4endl;
-  G4cout << "Post-step position: " << postPos << " (TC: " << postPos_TC << ")" << G4endl;
-  if(trackstatus==fStopAndKill){
-    G4cout<<" I DIED"<<G4endl;
-    G4cout<<" procname: "<<procname<<G4endl;
-  }
-  //G4cout << "Pre-step momentum: " << preMomentum << G4endl;
-  //G4cout << "Kinetic energy: " << kineticEnergy << G4endl;
-  //G4cout << "Theta: " << theta << ", Phi: " << phi << G4endl;
-  }
+  // if(volume==fTargetVolume){
+  // G4cout << "EventID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID() << G4endl;
+  // G4cout << "Particle: " << particleName << " (PID: " << particlePID << ")" << G4endl;
+  // G4cout << "Pre-step position: " << prePos << " (TC: " << prePos_TC << ")" << G4endl;
+  // G4cout << "Post-step position: " << postPos << " (TC: " << postPos_TC << ")" << G4endl;
+  // if(trackstatus==fStopAndKill){
+  //   G4cout<<" I DIED"<<G4endl;
+  //   G4cout<<" procname: "<<procname<<G4endl;
+  // }
+  // }
 
 }
 

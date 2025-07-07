@@ -5,7 +5,7 @@
 
 #
 # Change the default number of workers (in multi-threading mode) 
-/run/numberOfThreads 1
+/run/numberOfThreads 8
 #
 # Initialize kernel
 /run/initialize
@@ -18,5 +18,5 @@
 
 /gun/particle e-
 /gun/energy 8 GeV
-/run/beamOn 100
+/run/beamOn 100000
 
