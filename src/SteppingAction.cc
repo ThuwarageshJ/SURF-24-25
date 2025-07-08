@@ -127,8 +127,8 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     auto prePos = preStepPoint->GetPosition();
     auto prePos_TC = (prePos - fTargetCenter);
 
-    if(prePos_TC.z()==fTargetHalfZLength) 
-    // Store only particles coming out through rear face.
+    if(prePos_TC.z()==fTargetHalfZLength || abs(particlePID)==13) 
+    // Store only particles coming out through rear face, OR, muons from any face
     { 
       StoreData(step, volume, 1);
     }  
@@ -153,22 +153,35 @@ void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume, G4in
   auto postPos = postStepPoint->GetPosition();
   auto postPos_TC = (postPos - fTargetCenter);
   
-  auto proc = postStepPoint->GetProcessDefinedStep();
-  auto procname = proc->GetProcessName();
-
-  auto dotZ = prePos_TC.unit().z();
-  auto phi = std::atan2(prePos_TC.y(), prePos_TC.x());
-  if (phi < 0) {phi += 2 * CLHEP::pi;}
-  auto theta = std::acos(dotZ);
+  // auto proc = postStepPoint->GetProcessDefinedStep();
+  // auto procname = proc->GetProcessName();
 
   auto preMomentum = preStepPoint->GetMomentum();
   auto kineticEnergy = preStepPoint->GetKineticEnergy();
   auto restMass = particleDef->GetPDGMass();
 
+  auto dotZ = prePos_TC.unit().z();
+  auto dotZ_p = preMomentum.unit().z();
+  auto phi = std::atan2(prePos_TC.y(), prePos_TC.x());
+  if (phi < 0) {phi += 2 * CLHEP::pi;}
+  auto theta_r = std::acos(dotZ);
+  auto theta_p = std::acos(dotZ_p);
+
   G4int eventID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
   
   auto process_type = (type==1 ? "outgoing": "intarget");
   if(trackstatus == fStopAndKill && type==0){process_type = "kill";}
+
+  auto creator_process = "N/A";
+  auto post_process = "N/A";
+  const G4VProcess* proc = track->GetCreatorProcess();
+  if(proc){
+    creator_process = proc->GetProcessName();
+  }
+  const G4VProcess* postProc = postStepPoint->GetProcessDefinedStep();
+  if(postProc){
+    post_process = postProc->GetProcessName();
+  }
   
   G4int hid = 0;
   man->FillNtupleIColumn(hid, eventID);
@@ -192,21 +205,13 @@ void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume, G4in
   man->FillNtupleFColumn(++hid, preMomentum.y());
   man->FillNtupleFColumn(++hid, preMomentum.z());
   man->FillNtupleFColumn(++hid, kineticEnergy);
-  man->FillNtupleFColumn(++hid, theta);
+  man->FillNtupleFColumn(++hid, theta_p);
+  man->FillNtupleFColumn(++hid, theta_r);
   man->FillNtupleFColumn(++hid, phi);
+  man->FillNtupleSColumn(++hid, creator_process);
+  man->FillNtupleSColumn(++hid, post_process);
   man->FillNtupleSColumn(++hid, process_type);
   man->AddNtupleRow(0);
-
-  // if(volume==fTargetVolume){
-  // G4cout << "EventID: " << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID() << G4endl;
-  // G4cout << "Particle: " << particleName << " (PID: " << particlePID << ")" << G4endl;
-  // G4cout << "Pre-step position: " << prePos << " (TC: " << prePos_TC << ")" << G4endl;
-  // G4cout << "Post-step position: " << postPos << " (TC: " << postPos_TC << ")" << G4endl;
-  // if(trackstatus==fStopAndKill){
-  //   G4cout<<" I DIED"<<G4endl;
-  //   G4cout<<" procname: "<<procname<<G4endl;
-  // }
-  // }
 
 }
 
