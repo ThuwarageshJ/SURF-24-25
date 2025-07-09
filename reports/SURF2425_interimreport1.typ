@@ -67,6 +67,8 @@ The second proposed modification aims on increasing the statistical accuracy of 
 
 == Analysis of physical processes inside the target
 
+The first of the above mentioned modifications
+
 
 
 

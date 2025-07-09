@@ -44,7 +44,7 @@ namespace B1
 class DetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
-    DetectorConstruction() = default;
+    DetectorConstruction(G4bool bf);
     ~DetectorConstruction() override = default;
 
     G4VPhysicalVolume* Construct() override;
@@ -60,6 +60,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     G4LogicalVolume* fScoringVolume = nullptr;
     G4LogicalVolume* fTargetVolume = nullptr;
     G4ThreeVector fTargetCenter = G4ThreeVector();
+    G4bool fBiasingOn = false;
 
 };
 

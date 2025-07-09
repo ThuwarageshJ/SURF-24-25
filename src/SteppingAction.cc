@@ -177,6 +177,9 @@ void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume, G4in
   const G4VProcess* proc = track->GetCreatorProcess();
   if(proc){
     creator_process = proc->GetProcessName();
+    if(creator_process=="biasWrapper(muPairProd)"){
+      G4cout<<"YEHEHEHEHEHE"<<G4endl;
+    }
   }
   const G4VProcess* postProc = postStepPoint->GetProcessDefinedStep();
   if(postProc){

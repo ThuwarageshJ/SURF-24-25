@@ -42,6 +42,9 @@
 #include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
 
+#include "G4GenericBiasingPhysics.hh"
+#include "G4EmExtraParameters.hh"
+
 // #include "Randomize.hh"
 
 using namespace B1;
@@ -68,13 +71,34 @@ int main(int argc, char** argv)
   //
   auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
 
+  G4bool biasingFlag = true;
+
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager->SetUserInitialization(new DetectorConstruction());
+  runManager->SetUserInitialization(new DetectorConstruction(biasingFlag));
 
   // Physics list
   auto physicsList = new QBBC;
+
+  if (biasingFlag) {
+    // -- and augment it with biasing facilities:
+    G4GenericBiasingPhysics* biasingPhysics = new G4GenericBiasingPhysics();
+    biasingPhysics->Bias("mu+");
+    biasingPhysics->Bias("mu-");
+    physicsList->RegisterPhysics(biasingPhysics);
+    G4cout << "      ********************************************************* " << G4endl;
+    G4cout << "      ********** processes are wrapped for biasing ************ " << G4endl;
+    G4cout << "      ********************************************************* " << G4endl;
+  }
+  else {
+    G4cout << "      ************************************************* " << G4endl;
+    G4cout << "      ********** processes are not wrapped ************ " << G4endl;
+    G4cout << "      ************************************************* " << G4endl;
+  }
+
+  // auto biasing_mupairprod = new G4EmExtraParameters;
+  // biasing_mupairprod->SetProcessBiasingFactor("muPairProd",1000000.,true);
   
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);

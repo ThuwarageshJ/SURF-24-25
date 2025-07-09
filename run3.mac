@@ -6,10 +6,11 @@
 #
 # Change the default number of workers (in multi-threading mode) 
 /random/setSeeds  565 478
-/run/numberOfThreads 16
+/run/numberOfThreads 1
 #
 # Initialize kernel
 /run/initialize
+#/process/list
 #
 /control/verbose 0
 /run/verbose 0
@@ -19,5 +20,5 @@
 
 /gun/particle e-
 /gun/energy 8 GeV
-/run/beamOn 1000000
+/run/beamOn 1000
 
