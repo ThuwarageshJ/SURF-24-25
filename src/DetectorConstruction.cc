@@ -179,7 +179,6 @@ void DetectorConstruction::ConstructSDandField()
   SensitiveDetector *SD = new SensitiveDetector("SensitiveDetector");
   
   SetSensitiveDetector("Target", SD, true);
-
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

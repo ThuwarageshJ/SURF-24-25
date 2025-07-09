@@ -42,6 +42,9 @@
 #include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
 
+#include "G4GenericBiasingPhysics.hh"
+#include "G4EmExtraParameters.hh"
+
 // #include "Randomize.hh"
 
 using namespace B1;
@@ -78,12 +81,6 @@ int main(int argc, char** argv)
   
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);
-
-  // G4ParticleDefinition* gamma = G4Gamma::Definition();
-  // G4ProcessManager* pmanager = gamma->GetProcessManager();
-  // if (pmanager) {
-  //     pmanager->AddDiscreteProcess(new G4GammaConversionToMuons());
-  // }
 
   // User action initialization
   runManager->SetUserInitialization(new ActionInitialization());
