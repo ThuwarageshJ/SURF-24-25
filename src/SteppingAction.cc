@@ -182,6 +182,8 @@ void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume, G4in
   if(postProc){
     post_process = postProc->GetProcessName();
   }
+
+  G4int parentID = track->GetParentID();  
   
   G4int hid = 0;
   man->FillNtupleIColumn(hid, eventID);
@@ -208,6 +210,7 @@ void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume, G4in
   man->FillNtupleFColumn(++hid, theta_p);
   man->FillNtupleFColumn(++hid, theta_r);
   man->FillNtupleFColumn(++hid, phi);
+  man->FillNtupleIColumn(++hid, parentID);
   man->FillNtupleSColumn(++hid, creator_process);
   man->FillNtupleSColumn(++hid, post_process);
   man->FillNtupleSColumn(++hid, process_type);
