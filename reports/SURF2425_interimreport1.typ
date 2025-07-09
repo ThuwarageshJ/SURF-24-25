@@ -51,38 +51,36 @@ Another proposed angle of attack is to study the physical processes that are exp
 
 = Current Progress
 
+In the first 3 weeks, we have completed the following steps in the proposed approach.
+
+== Software installation and modeling the experimental setup
+
+Our initial steps involved installing _Geant4_ and developing the necessary code to simulate the experimental setup. The current configuration features a 10 cm-sided tungsten cube serving as the fixed target for the electron beam. To replicate LDMX conditions, the beam is simulated to emit single 8 GeV electrons per event from a randomly chosen point within a 3 cm $times$ 8 cm area, aimed at the center of the cube’s face. For statistical purposes, we have conducted runs of $10^5$ to $10^6$ events.
+
+== Initial runs with naive conditions
+
+To assess the baseline level of muon production, we conducted 2 runs with the above mentioned setup. The detector was setup to track particles coming out of the cube in all directions and their physical properties (kinetic energy at surface, momentum at surface, and angle of emission). The first run with $10^4$ events produced no muons and the second run with $10^5$ events produced 2 $mu^+$ particles. These particles had energies and momenta of (50 MeV, 120 MeV) and (3 MeV, 25 MeV) and angles of $theta=110 degree$ and $theta=170 degree$ respectrively (measured with respect to the beam direction). These conditions are not optimal for the GeV-scale muons expected for the LDMX beam. The angles were also identified to be suboptimal since they indicate that the particles are highly diverging from the beam direction.
+
+Two modifications to the analysis and simulations were proposed at this stage. The first one focuses on understanding the relative frequencies of several muon production processes taking place inside the target. We decided to track and store the data for all the processes involving muons and pions (which are expected to decay into muons) along with the processes that created or killed those particles. This modification could help in understanding the physical processes of interest which then could inform about the changes required to be done for the target geometry to increase the outputs of such processes.
+
+The second proposed modification aims on increasing the statistical accuracy of the results of this and future simulations. Since _Geant4_ enables artifically biasing the cross sections for certain events, we can increase the probability of muon production processes by a large factor. Although this is not a feasible in real life, increasing the muon production in simulations will be an important step in accumulating the necessary statistics to justify the validity of the conclusions derived above and in the future. 
+
+== Analysis of physical processes inside the target
+
+
+
+
+
+
+
 = Challenges
 
-By analyzing different configurations and geometries of the tungsten target, we aim to determine the optimal setup that maximizes muon production while maintaining experimental feasibility.
-
-While this is the most straightforward way of muon-beam production inspired from the LDMX setup, we also aim to explore other ways of muon production and access their feasibility constraints in search of the most efficient and well-suited production method. Another possibility would be the production of muons through secondary processes: the electron-fixed target collisions can produce kaons and pions which can subsequently decay into muons.
-
-This research aligns with ongoing efforts in experimental particle physics to develop novel methods for dark matter searches. If successful, the results of this study could contribute to the design of a next-generation LDMX-style experiment utilizing muon beams, thereby expanding the search for new physics beyond the Standard Model.
+= (Immediate) Future Directions
 
 
+= Conclusion
 
-= Approach <sec:methods>
 
-
-To accomplish the objectives of this study, we will follow a two-phase approach: first, evaluating various muon production methods applicable to the LDMX setup, and second, optimizing the tungsten fixed target geometry using _Geant4_ simulations to maximize muon yield.  
-
-The first phase will involve a detailed analysis of different muon production mechanisms, including direct muon pair production from electron-nucleus interactions and secondary muon production via pion and kaon decays. We will assess these methods based on their feasibility within the LDMX framework, expected muon flux, and experimental constraints such as target thickness and energy losses. A literature review and preliminary calculations will guide this evaluation.  
-
-In the second phase, we will implement a _Geant4_-based simulation framework to model electron-fixed target interactions, tracking muon production rates under different target configurations. Key parameters to be optimized include the thickness, shape, and composition of the tungsten target, as well as the beam energy and angular spread. If time permits, we will extend our optimization to the beam line to further enhance muon yield. The simulation results will be analyzed to identify configurations that offer the highest muon production efficiency while remaining experimentally viable.  
-
-// The most challenging aspect of this project will likely be achieving sufficient statistical accuracy in the _Geant4_ simulations due to the inherently low probability of muon production in electron-fixed target collisions. To address this, we will employ variance reduction techniques such as importance sampling and biasing to improve computational efficiency.  
-
-This research will be conducted in collaboration with Professor Echenard's and Professor Hitlin's groups, which have expertise in LDMX physics and _Geant4_ simulations. If applicable, our work may also depend on input from related studies exploring muon beams in fixed-target experiments.  
-
-By systematically comparing muon production methods and refining target configurations through simulation, this project aims to provide concrete insights into the feasibility of a muon-beam-based extension of LDMX, potentially informing future experimental designs.
-
-= Work Plan
-- Week 0: Installing _Geant4_ and getting familiarized with it.
-- Week 1: Literature review of Muon production methods and      their feasibility and efficiency constraints.
-- Weeks 2-4: Development of required geometries of the Tungsten fixed target and collision physics in _Geant4_.
-- Weeks 5-6: Producing datasets and simulations for testing the developed geometries of the target collisions.
-- Weeks 7-9: Data analysis from all the simulations, calculations of efficiencies, and progress towards figuring out efficient frameworks of muon production.
-- Week 10: Conclusions and final decisions. Preparing the report.
 
 = References
 @LDMX:2018cma T. Akesson und others, "Light Dark Matter eXperiment (LDMX)", Nr. FERMILAB-PUB-18-324-A,
