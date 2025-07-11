@@ -41,6 +41,9 @@
 #include "G4SystemOfUnits.hh"
 #include "G4Box.hh"
 
+
+#include "G4BiasingProcessInterface.hh"
+
 namespace B1
 {
 
@@ -82,7 +85,22 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   auto track = step->GetTrack();
   auto particleDef = track->GetDefinition();
   auto particlePID = particleDef->GetPDGEncoding();
-  
+
+  if ((particlePID == 22) && (track->GetCurrentStepNumber() == 1)) {
+    G4AnalysisManager *man = G4AnalysisManager::Instance();
+    man->FillH1(0, preStepPoint->GetKineticEnergy());
+    // Get the process defined in this step
+    const G4VProcess *process = postStepPoint->GetProcessDefinedStep();
+    // Check if the process is a G4BiasingProcessInterface
+    const G4BiasingProcessInterface *biasingProcess = dynamic_cast<const G4BiasingProcessInterface *>(process);
+    if (biasingProcess) {
+        G4VProcess *wrappedProcess = biasingProcess->GetWrappedProcess();
+        if (!wrappedProcess) {
+          G4cout << "Wrapped process is null!" << G4endl;
+        }
+    }
+  }
+
   if(volume!=fScoringVolume && fPrimaryStored && (abs(particlePID)!=13 && abs(particlePID)!=211))return;
   // If you're in target volume, proceed only if (1) you haven't stored primary particle data yet, or, (2) it's a pion or a muon
   // If you're in scoring volume, always proceed
@@ -152,9 +170,6 @@ void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume, G4in
   auto prePos_TC = (prePos - fTargetCenter);
   auto postPos = postStepPoint->GetPosition();
   auto postPos_TC = (postPos - fTargetCenter);
-  
-  // auto proc = postStepPoint->GetProcessDefinedStep();
-  // auto procname = proc->GetProcessName();
 
   auto preMomentum = preStepPoint->GetMomentum();
   auto kineticEnergy = preStepPoint->GetKineticEnergy();
@@ -177,9 +192,6 @@ void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume, G4in
   const G4VProcess* proc = track->GetCreatorProcess();
   if(proc){
     creator_process = proc->GetProcessName();
-    if(creator_process=="biasWrapper(muPairProd)"){
-      G4cout<<"YEHEHEHEHEHE"<<G4endl;
-    }
   }
   const G4VProcess* postProc = postStepPoint->GetProcessDefinedStep();
   if(postProc){

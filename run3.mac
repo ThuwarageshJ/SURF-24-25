@@ -5,12 +5,15 @@
 
 #
 # Change the default number of workers (in multi-threading mode) 
-/random/setSeeds  565 478
+/random/setSeeds  5 7
 /run/numberOfThreads 1
 #
 # Initialize kernel
 /run/initialize
+#
 #/process/list
+#/particle/select gamma
+#/particle/process/dump
 #
 /control/verbose 0
 /run/verbose 0

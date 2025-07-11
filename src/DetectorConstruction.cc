@@ -40,7 +40,7 @@
 #include "G4Trd.hh"
 #include "G4LogicalVolumeStore.hh"
 
-#include "GB01BOptrMultiParticleChangeCrossSection.hh"
+#include "GB01BOptrChangeCrossSection.hh"
 
 namespace B1
 {
@@ -189,19 +189,11 @@ void DetectorConstruction::ConstructSDandField()
     // -- Fetch volume for biasing:
     G4LogicalVolume* logicVolumeBiased = G4LogicalVolumeStore::GetInstance()->GetVolume("Target");
 
-    // ----------------------------------------------
-    // -- operator creation and attachment to volume:
-  // ----------------------------------------------
-    GB01BOptrMultiParticleChangeCrossSection* biasMany =
-      new GB01BOptrMultiParticleChangeCrossSection();
-    biasMany->AddParticle("mu+");
-    biasMany->AddParticle("mu-");
-    biasMany->AttachTo(logicVolumeBiased);
-    G4cout << " Attaching biasing operator " << biasMany->GetName() << " to logical volume "
+    GB01BOptrChangeCrossSection *biasingOperator = new GB01BOptrChangeCrossSection("gamma", 1000);
+    biasingOperator->AttachTo(logicVolumeBiased);
+    G4cout << " Attaching biasing operator " << biasingOperator->GetName() << " to logical volume "
 	   << logicVolumeBiased->GetName() << G4endl;
   }
-
-
 
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

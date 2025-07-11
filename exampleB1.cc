@@ -3,7 +3,7 @@
 // * License and Disclaimer                                           *
 // *                                                                  *
 // * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
+// * the Geant4 Collaboration.  It is provided  under the terms  and *
 // * conditions of the Geant4 Software License,  included in the file *
 // * LICENSE and available at  http://cern.ch/geant4/license .  These *
 // * include a list of copyright holders.                             *
@@ -31,10 +31,13 @@
 #include "DetectorConstruction.hh"
 #include "QBBC.hh"
 #include "QGSP_BERT.hh"
+#include "FTFP_BERT.hh"
+#include "G4EmExtraPhysics.hh"
 
 #include "G4Gamma.hh"
 #include "G4GammaConversionToMuons.hh"
 #include "G4ProcessManager.hh"
+#include "G4WrapperProcess.hh"
 
 #include "G4RunManagerFactory.hh"
 #include "G4SteppingVerbose.hh"
@@ -42,17 +45,80 @@
 #include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
 
+#include "G4BiasingProcessInterface.hh"
+#include "G4BiasingHelper.hh"
+
 #include "G4GenericBiasingPhysics.hh"
 #include "G4EmExtraParameters.hh"
+#include "G4EmParameters.hh"
+
+#include "G4PhysicsListHelper.hh"
 
 // #include "Randomize.hh"
 
 using namespace B1;
 
+namespace B1{
+class CustomPhysicsList : public FTFP_BERT {
+  public:
+      CustomPhysicsList() : FTFP_BERT(){
+        G4EmParameters::Instance()->SetGeneralProcessActive(false);
+        // auto biasing_photonNuclear = new G4EmExtraParameters;
+        // biasing_photonNuclear->SetProcessBiasingFactor("GammaToMuPair",1000.,true);
+        // G4GammaConversionToMuons* ha = new G4GammaConversionToMuons();
+        // ha->SetCrossSecFactor(1000);
+        // auto gammaMuConv = new G4GammaConversionToMuons();
+        // G4PhysicsListHelper::GetPhysicsListHelper()
+        //   ->RegisterProcess(gammaMuConv, G4Gamma::Gamma());
+      }
+  
+      ~CustomPhysicsList() {}
+      
+      void ConstructProcess()
+      {
+        FTFP_BERT::ConstructProcess();
+        
+        G4PhysicsListHelper* ph = G4PhysicsListHelper::GetPhysicsListHelper();
+        G4ParticleDefinition* particle = G4Gamma::Gamma();
+        G4GammaConversionToMuons* gammaMuConv = new G4GammaConversionToMuons();
+        gammaMuConv -> SetCrossSecFactor(1000.0);
+        ph->RegisterProcess(gammaMuConv, particle);
+        
+        G4cout << "G4GammaConversionToMuons process registered for gamma particles" << G4endl;
+      }
+};
+}
+
+namespace B1{
+void PrintProcesses() {
+      G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
+      G4ParticleTable::G4PTblDicIterator *particleIterator = particleTable->GetIterator();
+      particleIterator->reset();
+
+      while ((*particleIterator)()) {
+          G4ParticleDefinition *particle = particleIterator->value();
+          G4String particleName = particle->GetParticleName();
+          G4ProcessManager *pmanager = particle->GetProcessManager();
+          G4cout << "Particle: " << particleName << G4endl;
+
+          if (pmanager) {
+              G4ProcessVector *processVector = pmanager->GetProcessList();
+              for (size_t i = 0; i < processVector->size(); ++i) {
+                  G4VProcess *process = (*processVector)[i];
+                  G4String processName = process->GetProcessName();
+                  G4cout << " Process: " << processName << G4endl;
+              }
+          } else {
+              G4cout << " No process manager found for this particle." << G4endl;
+          }
+      }
+  }
+}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 int main(int argc, char** argv)
 {
+  G4cout << "Hello from main!" << G4endl;
   // Detect interactive mode (if no arguments) and define UI session
   //
   G4UIExecutive* ui = nullptr;
@@ -78,36 +144,29 @@ int main(int argc, char** argv)
   // Detector construction
   runManager->SetUserInitialization(new DetectorConstruction(biasingFlag));
 
-  // Physics list
-  auto physicsList = new QBBC;
+  auto physicsList = new CustomPhysicsList();
 
-  if (biasingFlag) {
-    // -- and augment it with biasing facilities:
-    G4GenericBiasingPhysics* biasingPhysics = new G4GenericBiasingPhysics();
-    biasingPhysics->Bias("mu+");
-    biasingPhysics->Bias("mu-");
+  // G4GammaConversionToMuons* ha = new G4GammaConversionToMuons();
+  // ha->SetCrossSecFactor(1000);
+  if(biasingFlag){
+    G4GenericBiasingPhysics *biasingPhysics = new G4GenericBiasingPhysics();
+
+    const std::vector<G4String> biasedList = {"GammaToMuPair"};
+    biasingPhysics->Bias("gamma", biasedList);
     physicsList->RegisterPhysics(biasingPhysics);
     G4cout << "      ********************************************************* " << G4endl;
     G4cout << "      ********** processes are wrapped for biasing ************ " << G4endl;
     G4cout << "      ********************************************************* " << G4endl;
   }
-  else {
-    G4cout << "      ************************************************* " << G4endl;
-    G4cout << "      ********** processes are not wrapped ************ " << G4endl;
-    G4cout << "      ************************************************* " << G4endl;
-  }
-
-  // auto biasing_mupairprod = new G4EmExtraParameters;
-  // biasing_mupairprod->SetProcessBiasingFactor("muPairProd",1000000.,true);
   
-  physicsList->SetVerboseLevel(1);
+  //PrintProcesses();
+
+  physicsList->DumpList();
+
   runManager->SetUserInitialization(physicsList);
 
-  // G4ParticleDefinition* gamma = G4Gamma::Definition();
-  // G4ProcessManager* pmanager = gamma->GetProcessManager();
-  // if (pmanager) {
-  //     pmanager->AddDiscreteProcess(new G4GammaConversionToMuons());
-  // }
+  physicsList->SetVerboseLevel(1);
+  runManager->SetUserInitialization(physicsList);
 
   // User action initialization
   runManager->SetUserInitialization(new ActionInitialization());

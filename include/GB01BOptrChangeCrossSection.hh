@@ -50,6 +50,8 @@
 class G4BOptnChangeCrossSection;
 class G4ParticleDefinition;
 #include <map>
+namespace B1
+{
 
 class GB01BOptrChangeCrossSection : public G4VBiasingOperator
 {
@@ -57,7 +59,7 @@ class GB01BOptrChangeCrossSection : public G4VBiasingOperator
     // ------------------------------------------------------------
     // -- Constructor: takes the name of the particle type to bias:
     // ------------------------------------------------------------
-    GB01BOptrChangeCrossSection(G4String particleToBias, G4String name = "ChangeXS");
+    GB01BOptrChangeCrossSection(G4String particleName, G4double XSChangeFactor, G4String name = "ChangeXS");
     virtual ~GB01BOptrChangeCrossSection();
 
     // -- method called at beginning of run:
@@ -104,6 +106,7 @@ class GB01BOptrChangeCrossSection : public G4VBiasingOperator
       fChangeCrossSectionOperations;
     G4bool fSetup;
     const G4ParticleDefinition* fParticleToBias;
+    G4double fXSChangeFactor;
 };
-
+}//namespace B1
 #endif
