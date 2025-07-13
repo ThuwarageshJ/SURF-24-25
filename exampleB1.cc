@@ -63,30 +63,23 @@ class CustomPhysicsList : public FTFP_BERT {
   public:
       CustomPhysicsList() : FTFP_BERT(){
         G4EmParameters::Instance()->SetGeneralProcessActive(false);
-        // auto biasing_photonNuclear = new G4EmExtraParameters;
-        // biasing_photonNuclear->SetProcessBiasingFactor("GammaToMuPair",1000.,true);
-        // G4GammaConversionToMuons* ha = new G4GammaConversionToMuons();
-        // ha->SetCrossSecFactor(1000);
-        // auto gammaMuConv = new G4GammaConversionToMuons();
-        // G4PhysicsListHelper::GetPhysicsListHelper()
-        //   ->RegisterProcess(gammaMuConv, G4Gamma::Gamma());
       }
   
       ~CustomPhysicsList() {}
       
-      void ConstructProcess()
-      {
-        FTFP_BERT::ConstructProcess();
+      // void ConstructProcess()
+      // {
+      //   FTFP_BERT::ConstructProcess();
         
-        G4PhysicsListHelper* ph = G4PhysicsListHelper::GetPhysicsListHelper();
-        G4ParticleDefinition* particle = G4Gamma::Gamma();
-        G4GammaConversionToMuons* gammaMuConv = new G4GammaConversionToMuons();
-        gammaMuConv -> SetCrossSecFactor(1000.0);
-        ph->RegisterProcess(gammaMuConv, particle);
+      //   G4PhysicsListHelper* ph = G4PhysicsListHelper::GetPhysicsListHelper();
+      //   G4ParticleDefinition* particle = G4Gamma::Gamma();
+      //   G4GammaConversionToMuons* gammaMuConv = new G4GammaConversionToMuons();
+      //   gammaMuConv -> SetCrossSecFactor(1000.0);
+      //   ph->RegisterProcess(gammaMuConv, particle);
         
-        G4cout << "G4GammaConversionToMuons process registered for gamma particles" << G4endl;
-      }
-};
+      //   G4cout << "G4GammaConversionToMuons process registered for gamma particles" << G4endl;
+      // }
+  };
 }
 
 namespace B1{
@@ -125,29 +118,26 @@ int main(int argc, char** argv)
   if (argc == 1) {
     ui = new G4UIExecutive(argc, argv);
   }
-
   // Optionally: choose a different Random engine...
   // G4Random::setTheEngine(new CLHEP::MTwistEngine);
 
   // use G4SteppingVerboseWithUnits
   G4int precision = 4;
   G4SteppingVerbose::UseBestUnit(precision);
-
   // Construct the default run manager
   //
   auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
 
   G4bool biasingFlag = true;
-
   // Set mandatory initialization classes
   //
   // Detector construction
   runManager->SetUserInitialization(new DetectorConstruction(biasingFlag));
 
   auto physicsList = new CustomPhysicsList();
-
   // G4GammaConversionToMuons* ha = new G4GammaConversionToMuons();
   // ha->SetCrossSecFactor(1000);
+
   if(biasingFlag){
     G4GenericBiasingPhysics *biasingPhysics = new G4GenericBiasingPhysics();
 
@@ -158,19 +148,14 @@ int main(int argc, char** argv)
     G4cout << "      ********** processes are wrapped for biasing ************ " << G4endl;
     G4cout << "      ********************************************************* " << G4endl;
   }
-  
-  //PrintProcesses();
-
+  PrintProcesses();
   physicsList->DumpList();
-
   runManager->SetUserInitialization(physicsList);
-
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);
 
   // User action initialization
   runManager->SetUserInitialization(new ActionInitialization());
-
   // Initialize visualization with the default graphics system
   auto visManager = new G4VisExecutive(argc, argv);
   // Constructors can also take optional arguments:
@@ -179,11 +164,10 @@ int main(int argc, char** argv)
   // auto visManager = new G4VisExecutive(argc, argv, "OGL", "Quiet");
   // auto visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
-
   // Get the pointer to the User Interface manager
   auto UImanager = G4UImanager::GetUIpointer();
-
   // Process macro or start UI session
+
   //
   if (!ui) {
     // batch mode
@@ -205,7 +189,6 @@ int main(int argc, char** argv)
 
   delete visManager;
   delete runManager;
-
   //std::cin.get();
 }
 
