@@ -38,11 +38,16 @@
 #include "G4PVPlacement.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4Trd.hh"
+#include "G4LogicalVolumeStore.hh"
+
+#include "GB01BOptrChangeCrossSection.hh"
 
 namespace B1
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+DetectorConstruction::DetectorConstruction(G4bool bf):fBiasingOn(bf) {}
 
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
@@ -179,6 +184,17 @@ void DetectorConstruction::ConstructSDandField()
   SensitiveDetector *SD = new SensitiveDetector("SensitiveDetector");
   
   SetSensitiveDetector("Target", SD, true);
+
+  if(fBiasingOn) {
+    // -- Fetch volume for biasing:
+    G4LogicalVolume* logicVolumeBiased = G4LogicalVolumeStore::GetInstance()->GetVolume("Target");
+
+    GB01BOptrChangeCrossSection *biasingOperator = new GB01BOptrChangeCrossSection("gamma", 1000);
+    biasingOperator->AttachTo(logicVolumeBiased);
+    G4cout << " Attaching biasing operator " << biasingOperator->GetName() << " to logical volume "
+	   << logicVolumeBiased->GetName() << G4endl;
+  }
+
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

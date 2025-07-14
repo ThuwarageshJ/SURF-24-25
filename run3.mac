@@ -5,11 +5,16 @@
 
 #
 # Change the default number of workers (in multi-threading mode) 
-/random/setSeeds  565 478
-/run/numberOfThreads 1
+/random/setSeeds  10 456
+/run/numberOfThreads 16
 #
+/physics_lists/em/GammaToMuons true
 # Initialize kernel
 /run/initialize
+#
+#/process/list
+#/particle/select gamma
+#/particle/process/dump
 #
 /control/verbose 0
 /run/verbose 0

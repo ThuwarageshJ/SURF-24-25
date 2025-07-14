@@ -11,7 +11,8 @@
   eq-numbering: "(1.1)",
   eq-chapterwise: true,
   bibliography: bibliography("refs.bib"),
-  bib-titel: "References"
+  bib-titel: "References",
+  lang: "en"
 )
 
 
@@ -61,39 +62,57 @@ Our initial steps involved installing _Geant4_ and developing the necessary code
 
 To assess the baseline level of muon production, we conducted 2 runs with the above mentioned setup. The detector was setup to track particles coming out of the cube in all directions and their physical properties (kinetic energy at surface, momentum at surface, and angle of emission). The first run with $10^4$ events produced no muons and the second run with $10^5$ events produced 2 $mu^+$ particles. These particles had energies and momenta of (50 MeV, 120 MeV) and (3 MeV, 25 MeV) and angles of $theta=110 degree$ and $theta=170 degree$ respectrively (measured with respect to the beam direction). These conditions are not optimal for the GeV-scale muons expected for the LDMX beam. The angles were also identified to be suboptimal since they indicate that the particles are highly diverging from the beam direction.
 
+As shown in @fig:ke_vs_z, the kinetic energy distribution of muons reveals that the majority of produced muons have very low energies, with most falling well below the GeV scale required for LDMX. The z-position analysis in @fig:z_analysis shows the spatial distribution of muon production within the target, providing insights into where muon production is most efficient and how the particles propagate through the tungsten target.
+
+
+
+#figure(
+  caption: [Spatial distribution analysis of muons from $10^6$ events simulation: (left) Distribution of the displacements in the $z-$direction and (right) Distribution of the creation $z-$coordinate],
+  placement: top,
+  grid(
+    columns: 2,
+    image("images/z_disp_distribution_muons_100k_naive.png", width: 100%),
+    image("images/z_distribution_muons_100k_naive.png", width: 100%)
+  )
+) <fig:z_analysis>
+
 Two modifications to the analysis and simulations were proposed at this stage. The first one focuses on understanding the relative frequencies of several muon production processes taking place inside the target. We decided to track and store the data for all the processes involving muons and pions (which are expected to decay into muons) along with the processes that created or killed those particles. This modification could help in understanding the physical processes of interest which then could inform about the changes required to be done for the target geometry to increase the outputs of such processes.
 
 The second proposed modification aims on increasing the statistical accuracy of the results of this and future simulations. Since _Geant4_ enables artifically biasing the cross sections for certain events, we can increase the probability of muon production processes by a large factor. Although this is not a feasible in real life, increasing the muon production in simulations will be an important step in accumulating the necessary statistics to justify the validity of the conclusions derived above and in the future. 
 
 == Analysis of physical processes inside the target
 
+The first of the above mentioned modifications -- analyzing muon and pion physical processes taking place inside the target -- was implemented and a run with $10^6$ events was simulated. We observed that around 2500 muons were produced across all the events and all of them were results of pion decays: $pi^+ -> mu^+ + nu_mu$ or $pi^- -> mu^- + overline(nu)_mu$. The maximum kinetic energy observed was around 800 MeV and around 93% of the muons were produced from muons decaying at rest, and so had kinetic energies of 4.2 MeV. As we mentioned earlier, these kinetic energies are much lower thant he GeV-scale muon beam required for the functioning of the LDMX experiment. 
 
-
-
-
-
+#figure(
+  caption: [Kinetic energy vs creation $z-$coordinate for muons from 1000000 event simulation],
+  image("images/KE_vs_z_muons_1000k_naive.png", width: 50%)
+) <fig:ke_vs_z>
 
 = Challenges
-
-= (Immediate) Future Directions
+Since an overwhelming amount of muons that are produced from pions have an extremely small kinetic energies, these would be suboptimal for the beam production. An alternative is to produce the muons through the so-called trident processes in which a high energy $gamma$ photon interacts with a heavy nucleus (Tungsten in our case) to produce $mu^+$ and $mu^-$ pairs. If such processes occur resulting in an extremely uneven distribution of kinetic energies between the particle and the anti-particle, then one of them can be expected to have a sufficiently large kinetic energy. However, as our results imply, this processes has an extremely small cross section that we do not see it in naive analysis. Thus, we are currently working on biasing the cross section for this event in order to gather more statistics to understand its frequency and the resulting kinetic energy, momentum, and angular distributions.
 
 
 = Conclusion
 
+In conclusion, our initial Geant4 simulations have revealed that conventional muon production via pion decay in electron-tungsten collisions yields predominantly low-energy muons, insufficient for LDMX beam requirements. By systematically analyzing the underlying processes and implementing cross-section biasing to enhance rare but promising channels like trident production, we are building a robust framework to optimize target design and maximize high-energy muon yield. These efforts will not only inform the development of efficient muon sources for future experiments but also deepen our understanding of particle interactions in dense materials, paving the way for more sensitive searches for new physics.
 
 
-= References
-@LDMX:2018cma T. Akesson und others, "Light Dark Matter eXperiment (LDMX)", Nr. FERMILAB-PUB-18-324-A,
-SLAC-PUB-17303, 2018, doi: https://doi.org/10.48550/arXiv.1808.05219.
 
-@M3:2018 Y. Khan und others, "$M^3$
-: A New Muon Missing Momentum Experiment to Probe $(𝑔 − 2)_mu$
- and
-Dark Matter at Fermilab", Nr. FERMILAB-PUB-18-087-A, PUPT-2557, 2018, doi: https://doi.org/
-10.1007/JHEP09%282018%29153.
 
-@MuonDM2017 C.-Y. Chen und others, "Muon Beam Experiments to Probe the Dark Sector", Physical Review
-Letters, 2017, doi: https://doi.org/10.1103/PhysRevD.95.115005.
+
+// = References
+// @LDMX:2018cma T. Akesson und others, "Light Dark Matter eXperiment (LDMX)", Nr. FERMILAB-PUB-18-324-A,
+// SLAC-PUB-17303, 2018, doi: https://doi.org/10.48550/arXiv.1808.05219.
+
+// @M3:2018 Y. Khan und others, "$M^3$
+// : A New Muon Missing Momentum Experiment to Probe $(𝑔 − 2)_mu$
+//  and
+// Dark Matter at Fermilab", Nr. FERMILAB-PUB-18-087-A, PUPT-2557, 2018, doi: https://doi.org/
+// 10.1007/JHEP09%282018%29153.
+
+// @MuonDM2017 C.-Y. Chen und others, "Muon Beam Experiments to Probe the Dark Sector", Physical Review
+// Letters, 2017, doi: https://doi.org/10.1103/PhysRevD.95.115005.
 
 // #figure(
 //   caption: [The Planets of the Solar System and Their Average Distance from the Sun],

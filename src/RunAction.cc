@@ -102,6 +102,8 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   G4String filename = G4String("rootfiles/output_") + datetime + ".root";
   man->OpenFile(filename);
 
+  man->CreateH1("Gamma", "Gamma_KE", 100, 0., 8000*MeV);
+
   man->CreateNtuple("Particles", "Particles");
   man->CreateNtupleIColumn("fEventID");
   man->CreateNtupleIColumn("fTrackID");
@@ -123,6 +125,7 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   man->CreateNtupleFColumn("fPx");
   man->CreateNtupleFColumn("fPy");
   man->CreateNtupleFColumn("fPz");
+  man->CreateNtupleFColumn("fP");
   man->CreateNtupleFColumn("fKE");
   man->CreateNtupleFColumn("fTheta_P");
   man->CreateNtupleFColumn("fTheta_R");
