@@ -221,6 +221,7 @@ void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume, G4in
   man->FillNtupleFColumn(++hid, preMomentum.x());
   man->FillNtupleFColumn(++hid, preMomentum.y());
   man->FillNtupleFColumn(++hid, preMomentum.z());
+  man->FillNtupleFColumn(++hid, preMomentum.mag());
   man->FillNtupleFColumn(++hid, kineticEnergy);
   man->FillNtupleFColumn(++hid, theta_p);
   man->FillNtupleFColumn(++hid, theta_r);

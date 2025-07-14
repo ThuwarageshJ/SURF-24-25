@@ -125,6 +125,7 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   man->CreateNtupleFColumn("fPx");
   man->CreateNtupleFColumn("fPy");
   man->CreateNtupleFColumn("fPz");
+  man->CreateNtupleFColumn("fP");
   man->CreateNtupleFColumn("fKE");
   man->CreateNtupleFColumn("fTheta_P");
   man->CreateNtupleFColumn("fTheta_R");

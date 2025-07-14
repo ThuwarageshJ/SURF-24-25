@@ -118,6 +118,12 @@ int main(int argc, char** argv)
   if (argc == 1) {
     ui = new G4UIExecutive(argc, argv);
   }
+
+  G4bool biasingFlag = false;
+
+  if (argc>=3){
+    biasingFlag = (std::string(argv[2]) == "on") ? true : false;
+  }
   // Optionally: choose a different Random engine...
   // G4Random::setTheEngine(new CLHEP::MTwistEngine);
 
@@ -128,7 +134,7 @@ int main(int argc, char** argv)
   //
   auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
 
-  G4bool biasingFlag = true;
+  
   // Set mandatory initialization classes
   //
   // Detector construction
