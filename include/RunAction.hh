@@ -66,6 +66,7 @@ class RunAction : public G4UserRunAction
 
   protected:
     G4ThreeVector fTargetCenter;
+    G4double fTargetZ;
     
     //G4String Ntupledir = "C:/Users/thuwa/Geant4/geant4-v11.3.2/program_files/share/Geant4/examples/basic/B1_W/data";
 };

@@ -42,9 +42,9 @@ namespace B1
 class ActionInitialization : public G4VUserActionInitialization
 {
   public:
-    ActionInitialization() = default;
+    ActionInitialization(G4bool backgroundsides) : fBGSides(backgroundsides) {};
     ~ActionInitialization() override = default;
-
+    G4bool fBGSides;
     void BuildForMaster() const override;
     void Build() const override;
 };

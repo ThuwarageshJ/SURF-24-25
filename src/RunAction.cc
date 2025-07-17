@@ -72,6 +72,7 @@ RunAction::RunAction()
     const DetectorConstruction* detConstruction =
       static_cast<const DetectorConstruction*>(G4RunManager::GetRunManager()->GetUserDetectorConstruction());
     fTargetCenter = detConstruction->GetTargetCenter();
+    fTargetZ = detConstruction->GetTargetZ();
   }
 }
 
@@ -90,16 +91,22 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   SensitiveDetector::ResetCounters();
 
   G4AnalysisManager *man = G4AnalysisManager::Instance();
-  //man->SetNtupleDirectoryName(Ntupledir);
+
   // Add date and time to the output filename
-  G4int eventsize = run->GetNumberOfEventToBeProcessed();
-  time_t now = time(0);
-  struct tm *ltm = localtime(&now);
-  char date_mmdd[8];
+  int eventsize = run->GetNumberOfEventToBeProcessed();
+  time_t now = time(nullptr);
+  struct tm* ltm = localtime(&now);
+  char date_mmdd[8];  // enough for "MMDD\0"
   strftime(date_mmdd, sizeof(date_mmdd), "%m%d", ltm);
-  char datetime[32];
-  snprintf(datetime, sizeof(datetime), "%d_%s", eventsize, date_mmdd);
-  G4String filename = G4String("rootfiles/output_") + datetime + ".root";
+  char filename[256]; 
+  G4int n = snprintf(filename, sizeof(filename),
+                  "rootfiles/output_%d_%s_%.0fcm.root",
+                  eventsize, date_mmdd, fTargetZ);
+
+  if (n < 0 || n >= (int)sizeof(filename)) {
+      G4Exception("DetectorConstruction", "FileNameError",
+                  FatalException, "Filename buffer overflow");
+  }
   man->OpenFile(filename);
 
   man->CreateH1("Gamma", "Gamma_KE", 100, 0., 8000*MeV);

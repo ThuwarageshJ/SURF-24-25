@@ -120,10 +120,20 @@ int main(int argc, char** argv)
   }
 
   G4bool biasingFlag = false;
+  G4bool backgroundsides = false;
+  G4double target_thickness = 10.0;
 
   if (argc>=3){
     biasingFlag = (std::string(argv[2]) == "on") ? true : false;
+    auto bias = (biasingFlag)? "ON":"OFF";
+    G4cout<<"BIASING "<<bias<<G4endl;
   }
+  if (argc>=4){
+    backgroundsides = (std::string(argv[3]) == "side") ? true : false;
+    auto bg = (backgroundsides)? "WILL":"WILL NOT";
+    G4cout<<"BACKGROUND PROCESSES COMING OUT OF SIDES "<<bg<< " BE STORED"<<G4endl;
+  }
+
   // Optionally: choose a different Random engine...
   // G4Random::setTheEngine(new CLHEP::MTwistEngine);
 
@@ -133,16 +143,19 @@ int main(int argc, char** argv)
   // Construct the default run manager
   //
   auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
-
   
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager->SetUserInitialization(new DetectorConstruction(biasingFlag));
+  if (argc>=5){
+    target_thickness = std::stod(argv[4]);
+    G4cout<<"TARGET THICKNESS SET BY USER: "<<target_thickness<<G4endl;
+    runManager->SetUserInitialization(new DetectorConstruction(biasingFlag, target_thickness));
+  }else{
+    runManager->SetUserInitialization(new DetectorConstruction(biasingFlag));
+  }
 
   auto physicsList = new CustomPhysicsList();
-  // G4GammaConversionToMuons* ha = new G4GammaConversionToMuons();
-  // ha->SetCrossSecFactor(1000);
 
   if(biasingFlag){
     G4GenericBiasingPhysics *biasingPhysics = new G4GenericBiasingPhysics();
@@ -161,7 +174,7 @@ int main(int argc, char** argv)
   runManager->SetUserInitialization(physicsList);
 
   // User action initialization
-  runManager->SetUserInitialization(new ActionInitialization());
+  runManager->SetUserInitialization(new ActionInitialization(backgroundsides));
   // Initialize visualization with the default graphics system
   auto visManager = new G4VisExecutive(argc, argv);
   // Constructors can also take optional arguments:

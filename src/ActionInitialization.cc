@@ -57,7 +57,7 @@ void ActionInitialization::Build() const
   auto eventAction = new EventAction(runAction);
   SetUserAction(eventAction);
 
-  SetUserAction(new SteppingAction(eventAction));
+  SetUserAction(new SteppingAction(eventAction, fBGSides));
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -46,7 +46,7 @@ class EventAction;
 class SteppingAction : public G4UserSteppingAction
 {
   public:
-    SteppingAction(EventAction* eventAction);
+    SteppingAction(EventAction* eventAction, G4bool BGsides);
     ~SteppingAction() override = default;
 
     // method from the base class
@@ -61,6 +61,7 @@ class SteppingAction : public G4UserSteppingAction
     G4bool fPrimaryStored = false;
     G4int fLastEventID = -1;
     G4double fTargetHalfZLength;
+    G4bool fBGSides;
 
 };  // namespace B1
 }

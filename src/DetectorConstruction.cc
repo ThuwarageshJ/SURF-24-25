@@ -47,17 +47,27 @@ namespace B1
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-DetectorConstruction::DetectorConstruction(G4bool bf):fBiasingOn(bf) {}
+DetectorConstruction::DetectorConstruction(G4bool bf, G4double target_thickness):
+  fBiasingOn(bf),fTargetZ(target_thickness) 
+{}
 
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
   // Get nist material manager
   G4NistManager* nist = G4NistManager::Instance();
 
-  // Envelope parameters
-  //
-  G4double env_sizeXY = 200 * cm, env_sizeZ = 100 * cm;
+  // Dimensions
+  G4double env_sizeXY = 200 * cm;
+  G4double env_sizeZ = 100 * cm;
+  G4double world_sizeXY = 1.2 * env_sizeXY;
+  G4double world_sizeZ = 1.2 * env_sizeZ;
+  G4double targetXY = 10 * cm;
+  G4double targetZ = fTargetZ * cm;
+
+  // Materials
+  G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
   G4Material* env_mat = nist->FindOrBuildMaterial("G4_AIR");
+  G4Material* target_mat = nist->FindOrBuildMaterial("G4_W");
 
   // Option to switch on/off checking of volumes overlaps
   //
@@ -66,10 +76,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //
   // World
   //
-  G4double world_sizeXY = 1.2 * env_sizeXY;
-  G4double world_sizeZ = 1.2 * env_sizeZ;
-  G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
-
   auto solidWorld =
     new G4Box("World",  // its name
               0.5 * world_sizeXY, 0.5 * world_sizeXY, 0.5 * world_sizeZ);  // its size
@@ -89,7 +95,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   
   // Envelope
-  
   auto solidEnv = new G4Box("Envelope",  // its name
                             0.5 * env_sizeXY, 0.5 * env_sizeXY, 0.5 * env_sizeZ);  // its size
 
@@ -106,15 +111,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
                     0,  // copy number
                     checkOverlaps);  // overlaps checking
   
-  //
   // Tungsten Target
-  //
-  G4Material* target_mat = nist->FindOrBuildMaterial("G4_W");
   G4ThreeVector pos_target = G4ThreeVector(0* cm, 0 * cm, 10 * cm);
-
-  // Cubical section shape
-  G4double targetXY = 10 * cm;
-  G4double targetZ = 10* cm;
   
   auto solidTarget = new G4Box("Target", 0.5*targetXY, 0.5*targetXY, 0.5*targetZ);
 
@@ -123,7 +121,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
                                          target_mat,  // its material
                                          "Target");  // its name
                   
-
   auto physTarget = new G4PVPlacement(nullptr,  // no rotation
                     pos_target,  // at position
                     logicTarget,  // its logical volume

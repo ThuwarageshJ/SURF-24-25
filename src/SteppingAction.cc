@@ -49,7 +49,8 @@ namespace B1
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-SteppingAction::SteppingAction(EventAction* eventAction) : fEventAction(eventAction) {
+SteppingAction::SteppingAction(EventAction* eventAction, G4bool BGSides) 
+  : fEventAction(eventAction), fBGSides(BGSides) {
   // Initialize scoring volume and target center if not already done
   // To check if fTargetHalfZLength has no value stored in it, compare to 0 (uninitialized double is 0 by default in this context)
   if (!fScoringVolume || fTargetCenter == G4ThreeVector() || !fTargetVolume || fTargetHalfZLength == 0 ) {
@@ -145,8 +146,10 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     auto prePos = preStepPoint->GetPosition();
     auto prePos_TC = (prePos - fTargetCenter);
 
-    if(prePos_TC.z()==fTargetHalfZLength || abs(particlePID)==13) 
-    // Store only particles coming out through rear face, OR, muons from any face
+    G4bool store = (fBGSides)? true : (prePos_TC.z()==fTargetHalfZLength);
+
+    if(store) 
+    // Store only particles coming out through rear face, OR, from all sides, depending on fBGSides
     { 
       StoreData(step, volume, 1);
     }  
