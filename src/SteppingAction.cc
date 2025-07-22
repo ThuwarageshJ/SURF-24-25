@@ -61,7 +61,9 @@ SteppingAction::SteppingAction(EventAction* eventAction, G4bool BGSides)
     fTargetVolume = detConstruction->GetTargetVolume();
     G4Box* targetBox = dynamic_cast<G4Box*>(fTargetVolume->GetSolid());
     if(targetBox){
-      fTargetHalfZLength = targetBox->GetZHalfLength();   
+      fTargetHalfZLength = targetBox->GetZHalfLength();  
+      fTargetHalfXLength = targetBox->GetXHalfLength();
+      fTargetHalfYLength = targetBox->GetYHalfLength();
     }
   }
 }
@@ -145,8 +147,13 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   {
     auto prePos = preStepPoint->GetPosition();
     auto prePos_TC = (prePos - fTargetCenter);
+    auto fromTargetFlag = (
+        std::abs(prePos_TC.x()) == fTargetHalfXLength ||
+        std::abs(prePos_TC.y()) == fTargetHalfYLength ||
+        std::abs(prePos_TC.z()) == fTargetHalfZLength
+    );
 
-    G4bool store = (fBGSides)? true : (prePos_TC.z()==fTargetHalfZLength);
+    G4bool store = (fBGSides)? fromTargetFlag : (prePos_TC.z()==fTargetHalfZLength);
 
     if(store) 
     // Store only particles coming out through rear face, OR, from all sides, depending on fBGSides

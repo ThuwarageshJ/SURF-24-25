@@ -61,6 +61,8 @@ class SteppingAction : public G4UserSteppingAction
     G4bool fPrimaryStored = false;
     G4int fLastEventID = -1;
     G4double fTargetHalfZLength;
+    G4double fTargetHalfYLength;
+    G4double fTargetHalfXLength;
     G4bool fBGSides;
 
 };  // namespace B1

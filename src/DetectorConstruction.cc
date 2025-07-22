@@ -48,7 +48,7 @@ namespace B1
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DetectorConstruction::DetectorConstruction(G4bool bf, G4double target_thickness):
-  fBiasingOn(bf),fTargetZ(target_thickness) 
+  fBiasingOn(bf),fTargetZ(target_thickness)
 {}
 
 G4VPhysicalVolume* DetectorConstruction::Construct()
