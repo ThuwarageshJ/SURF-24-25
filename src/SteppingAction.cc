@@ -84,25 +84,25 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   auto postStepPoint = step->GetPostStepPoint();
   G4LogicalVolume* volume =
     preStepPoint->GetTouchableHandle()->GetVolume()->GetLogicalVolume();
-
+  
   auto track = step->GetTrack();
   auto particleDef = track->GetDefinition();
   auto particlePID = particleDef->GetPDGEncoding();
 
-  if ((particlePID == 22) && (track->GetCurrentStepNumber() == 1)) {
-    G4AnalysisManager *man = G4AnalysisManager::Instance();
-    man->FillH1(0, preStepPoint->GetKineticEnergy());
-    // Get the process defined in this step
-    const G4VProcess *process = postStepPoint->GetProcessDefinedStep();
-    // Check if the process is a G4BiasingProcessInterface
-    const G4BiasingProcessInterface *biasingProcess = dynamic_cast<const G4BiasingProcessInterface *>(process);
-    if (biasingProcess) {
-        G4VProcess *wrappedProcess = biasingProcess->GetWrappedProcess();
-        if (!wrappedProcess) {
-          G4cout << "Wrapped process is null!" << G4endl;
-        }
-    }
-  }
+  // if ((particlePID == 22) && (track->GetCurrentStepNumber() == 1)) {
+  //   // G4AnalysisManager *man = G4AnalysisManager::Instance();
+  //   // man->FillH1(0, preStepPoint->GetKineticEnergy());
+  //   // Get the process defined in this step
+  //   const G4VProcess *process = postStepPoint->GetProcessDefinedStep();
+  //   // Check if the process is a G4BiasingProcessInterface
+  //   const G4BiasingProcessInterface *biasingProcess = dynamic_cast<const G4BiasingProcessInterface *>(process);
+  //   if (biasingProcess) {
+  //       G4VProcess *wrappedProcess = biasingProcess->GetWrappedProcess();
+  //       if (!wrappedProcess) {
+  //         G4cout << "Wrapped process is null!" << G4endl;
+  //       }
+  //   }
+  // }
 
   if(volume!=fScoringVolume && fPrimaryStored && (abs(particlePID)!=13 && abs(particlePID)!=211))return;
   // If you're in target volume, proceed only if (1) you haven't stored primary particle data yet, or, (2) it's a pion or a muon
@@ -111,11 +111,11 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   G4double edepStep = step->GetTotalEnergyDeposit();
   fEventAction->AddEdep(edepStep);
 
-  G4AnalysisManager *man = G4AnalysisManager::Instance();
-
   if (track->GetParentID() == 0 && volume == fTargetVolume && preStepPoint->GetStepStatus() == fGeomBoundary ) 
   // Store details of primary event. Might help with findign correlations
   {
+    // G4AnalysisManager *man = G4AnalysisManager::Instance();
+
     fPrimaryStored = true;
         
     G4ThreeVector firstPos = preStepPoint->GetPosition();
@@ -125,23 +125,23 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
     G4int hid = 11;
 
-    man->FillNtupleFColumn(1, hid, firstPos.x()); // fX_hit
-    man->FillNtupleFColumn(1, ++hid, firstPos.y()); // fY_hit
-    man->FillNtupleFColumn(1, ++hid, firstPos.z()); // fZ_hit
-    man->FillNtupleFColumn(1, ++hid, firstPos_TC.x()); // fX_hit_TC
-    man->FillNtupleFColumn(1, ++hid, firstPos_TC.y()); // fY_hit_TC
-    man->FillNtupleFColumn(1, ++hid, firstPos_TC.z()); // fZ_hit_TC
-    man->FillNtupleFColumn(1, ++hid, firstMom.x()); // fPx_hit
-    man->FillNtupleFColumn(1, ++hid, firstMom.y()); // fPy_hit
-    man->FillNtupleFColumn(1, ++hid, firstMom.z()); // fPz_hit
-    man->FillNtupleFColumn(1, ++hid, kineticEnergy); // fKE_hit
+    // man->FillNtupleFColumn(1, hid, firstPos.x()); // fX_hit
+    // man->FillNtupleFColumn(1, ++hid, firstPos.y()); // fY_hit
+    // man->FillNtupleFColumn(1, ++hid, firstPos.z()); // fZ_hit
+    // man->FillNtupleFColumn(1, ++hid, firstPos_TC.x()); // fX_hit_TC
+    // man->FillNtupleFColumn(1, ++hid, firstPos_TC.y()); // fY_hit_TC
+    // man->FillNtupleFColumn(1, ++hid, firstPos_TC.z()); // fZ_hit_TC
+    // man->FillNtupleFColumn(1, ++hid, firstMom.x()); // fPx_hit
+    // man->FillNtupleFColumn(1, ++hid, firstMom.y()); // fPy_hit
+    // man->FillNtupleFColumn(1, ++hid, firstMom.z()); // fPz_hit
+    // man->FillNtupleFColumn(1, ++hid, kineticEnergy); // fKE_hit
 
   }
-  else if (volume==fTargetVolume && (abs(particlePID)==13 || abs(particlePID)==211))
-  // You're in target volume, and it's either a muon or a pion
-  { 
-    StoreData(step, volume, 0);
-  }
+  // else if (volume==fTargetVolume && (abs(particlePID)==13))
+  // // You're in target volume, and it's either a muon or a pion
+  // { 
+  //   StoreData(step, volume, 0);
+  // }
   else if (volume==fScoringVolume && preStepPoint->GetStepStatus() == fGeomBoundary)
   // in scoring volume.
   {
@@ -153,8 +153,9 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
         std::abs(prePos_TC.z()) == fTargetHalfZLength
     );
 
-    G4bool store = (fBGSides)? fromTargetFlag : (prePos_TC.z()==fTargetHalfZLength);
-
+    //G4bool store = (fBGSides || abs(particlePID)==13)? fromTargetFlag : (prePos_TC.z()==fTargetHalfZLength);
+    
+    G4bool store = abs(particlePID)==13 && fromTargetFlag;
     if(store) 
     // Store only particles coming out through rear face, OR, from all sides, depending on fBGSides
     { 
@@ -200,13 +201,10 @@ void SteppingAction::StoreData(const G4Step *step, G4LogicalVolume *volume, G4in
   auto creator_process = "N/A";
   auto post_process = "N/A";
   const G4VProcess* proc = track->GetCreatorProcess();
+  const G4VProcess* postProc = postStepPoint->GetProcessDefinedStep();
   if(proc){
     creator_process = proc->GetProcessName();
-    if (creator_process=="muPairProd"){
-      G4cout<<"Yehehehhehehe"<<G4endl;
-    }
   }
-  const G4VProcess* postProc = postStepPoint->GetProcessDefinedStep();
   if(postProc){
     post_process = postProc->GetProcessName();
   }

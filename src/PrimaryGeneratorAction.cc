@@ -120,7 +120,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
   G4double x0 = 0;
   G4double y0 = 0;
-  G4double z0 = -0.5 * envSizeZ;
+  G4double z0 = -0.5 * envSizeZ + 26 *um;
 
   if(targetSizeXY>=std::max(xwidth, ywidth)){
     x0 = xwidth * (G4UniformRand() - 0.5);
@@ -129,8 +129,6 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     x0 = size * targetSizeXY * (G4UniformRand() - 0.5);
     y0 = size * targetSizeXY * (G4UniformRand() - 0.5);  
   }
- 
-  z0 = -0.5 * envSizeZ;
 
   fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
 

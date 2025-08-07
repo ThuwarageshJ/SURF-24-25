@@ -7,16 +7,6 @@
 #include "G4ParticleDefinition.hh"
 #include <fstream>
 
-std::vector<MyHit> B1::SensitiveDetector::allHits;
-int B1::SensitiveDetector::muonCount = 0;
-int B1::SensitiveDetector::backgroundCount = 0;
-int B1::SensitiveDetector::currentRun = 0;
-
-void B1::SensitiveDetector::ResetCounters() {
-    muonCount = 0;
-    backgroundCount = 0;
-}
-
 namespace B1
 {
 SensitiveDetector::SensitiveDetector(const G4String& name) : G4VSensitiveDetector(name)
@@ -29,61 +19,69 @@ SensitiveDetector::~SensitiveDetector()
 
 G4bool SensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
 {
-    // auto edep = step->GetTotalEnergyDeposit();
-    // auto pos = step->GetPreStepPoint()->GetPosition();
-    // auto prestep = step->GetPreStepPoint();
-    // auto& preStepTouch = prestep->GetTouchableHandle();
-    // auto volume = preStepTouch->GetVolume();
-    // auto& name = volume->GetName();
-    // auto postStepPoint = step->GetPostStepPoint();
-    // auto aPro = postStepPoint->GetProcessDefinedStep();
-    // auto aProcess = aPro->GetProcessName();
-    // auto particleDef = step->GetTrack()->GetDefinition();
-    // auto pid = particleDef->GetPDGEncoding();
-    // auto particleName = particleDef->GetParticleName();
-
-    // MyHit hit;
-    // hit.run = currentRun;
-    // hit.x = pos.x();
-    // hit.y = pos.y();
-    // hit.z = pos.z();
-    // hit.edep = edep;
-    // hit.pid = pid;
-    // allHits.push_back(hit);
-
-    // G4int curtrack = step->GetTrack()->GetTrackID();
-    // if (particleName == "gamma"){
-    //     if(curtrackID==curtrack){
-    //         G4cout<<"PREVIOUS PARTICLE "<<curtrack<<G4endl;
-    //         G4cout <<" Particle name: " << particleName << " Pos: "<<hit.x<<" "<<hit.y<<" "<<hit.z<<" "<<hit.edep<<" Process: "<<aProcess<<G4endl;
-    //         G4ThreeVector postPos = postStepPoint->GetPosition();
-    //         G4cout << "  PostStep Pos: " << postPos.x() << " " << postPos.y() << " " << postPos.z() << G4endl;
-
-            
-    //     }else{
-    //         G4cout<<" NEWWW"<<curtrack<<G4endl;
-    //         G4cout <<" Particle name: " << particleName << " Pos: "<<hit.x<<" "<<hit.y<<" "<<hit.z<<" "<<hit.edep<<" Process: "<<aProcess<<G4endl;
-    //         G4ThreeVector postPos = postStepPoint->GetPosition();
-    //         G4cout << "  PostStep Pos: " << postPos.x() << " " << postPos.y() << " " << postPos.z() << G4endl;
-    //         curtrackID = curtrack;
-    //     }
-    // }
-    // if(curtrackID!=curtrack){
-    //     curtrackID = 
-    // }
-    
-    
-    //firstTrack = true;
-
-    
-
-
-    
-
-    // if (abs(pid) == 13) muonCount++;
-    // else backgroundCount++;
-
+    //StoreData(step);
     return true;
+}
+
+void SensitiveDetector::StoreData(const G4Step *step)
+{ 
+  // G4AnalysisManager is thread-safe in Geant4, but we need to be careful
+  // Worker threads can fill ntuples, master thread handles file I/O
+  G4AnalysisManager *man = G4AnalysisManager::Instance();
+
+  auto track = step->GetTrack();
+  auto trackstatus = track->GetTrackStatus();
+  track->SetTrackStatus(fStopAndKill); // Stop the track after storing data
+  auto trackID = track->GetTrackID();
+  auto particleDef = track->GetDefinition();
+  auto particlePID = particleDef->GetPDGEncoding();
+  auto particleName = particleDef->GetParticleName();
+  auto restMass = particleDef->GetPDGMass();
+
+  auto preStepPoint = step->GetPreStepPoint();
+  G4int copyNumber = preStepPoint->GetTouchableHandle()->GetCopyNumber();
+
+  auto prePos = preStepPoint->GetPosition();
+  auto preMomentum = preStepPoint->GetMomentum();
+  auto kineticEnergy = preStepPoint->GetKineticEnergy();
+  
+  auto dotZ = prePos.unit().z();
+  auto dotZ_p = preMomentum.unit().z();
+  auto phi = std::atan2(prePos.y(), prePos.x());
+  if (phi < 0) {phi += 2 * CLHEP::pi;}
+  auto theta_p = std::acos(dotZ_p);
+
+  G4int eventID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+
+  auto creator_process = "N/A";
+  const G4VProcess* proc = track->GetCreatorProcess();
+  if(proc){
+    creator_process = proc->GetProcessName();
+  }
+
+  G4int parentID = track->GetParentID();  
+  
+  // Fill the SD ntuple (ntuple ID = 1)
+  G4int hid = 0;
+  man->FillNtupleIColumn(1, hid, eventID);
+  man->FillNtupleIColumn(1, ++hid, trackID);
+  man->FillNtupleSColumn(1, ++hid, particleName);
+  man->FillNtupleIColumn(1, ++hid, particlePID);
+  man->FillNtupleFColumn(1, ++hid, restMass);
+  man->FillNtupleIColumn(1, ++hid, copyNumber);
+  man->FillNtupleFColumn(1, ++hid, prePos.x());
+  man->FillNtupleFColumn(1, ++hid, prePos.y());
+  man->FillNtupleFColumn(1, ++hid, prePos.z());
+  man->FillNtupleFColumn(1, ++hid, preMomentum.x());
+  man->FillNtupleFColumn(1, ++hid, preMomentum.y());
+  man->FillNtupleFColumn(1, ++hid, preMomentum.z());
+  man->FillNtupleFColumn(1, ++hid, preMomentum.mag());
+  man->FillNtupleFColumn(1, ++hid, kineticEnergy);
+  man->FillNtupleFColumn(1, ++hid, theta_p);
+  man->FillNtupleFColumn(1, ++hid, phi);
+  man->FillNtupleIColumn(1, ++hid, parentID);
+  man->FillNtupleSColumn(1, ++hid, creator_process);
+  man->AddNtupleRow(1);
 }
 
 }

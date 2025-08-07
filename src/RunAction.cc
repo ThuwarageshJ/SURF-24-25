@@ -87,11 +87,11 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->Reset();
 
-  SensitiveDetector::currentRun = run->GetRunID();
-  SensitiveDetector::ResetCounters();
-
+  // Only master thread should handle file operations and ntuple creation
+  //if (IsMaster()) {
   G4AnalysisManager *man = G4AnalysisManager::Instance();
-
+  //man->SetNtupleMerging(true);
+  // man->SetVerboseLevel(1);
   // Add date and time to the output filename
   int eventsize = run->GetNumberOfEventToBeProcessed();
   time_t now = time(nullptr);
@@ -109,7 +109,7 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   }
   man->OpenFile(filename);
 
-  man->CreateH1("Gamma", "Gamma_KE", 100, 0., 8000*MeV);
+  //man->CreateH1("Gamma", "Gamma_KE", 100, 0., 8000*MeV);
 
   man->CreateNtuple("Particles", "Particles");
   man->CreateNtupleIColumn("fEventID");
@@ -143,31 +143,51 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   man->CreateNtupleSColumn("fType");
   man->FinishNtuple(0);
 
-  man->CreateNtuple("Primaries", "Primaries");
-  man->CreateNtupleIColumn(1, "fEventID");
-  man->CreateNtupleFColumn(1, "fX_emitted");
-  man->CreateNtupleFColumn(1, "fY_emitted");
-  man->CreateNtupleFColumn(1, "fZ_emitted");
-  man->CreateNtupleFColumn(1, "fX_emitted_TC");
-  man->CreateNtupleFColumn(1, "fY_emitted_TC");
-  man->CreateNtupleFColumn(1, "fZ_emitted_TC");
-  man->CreateNtupleFColumn(1, "fPx_emitted");
-  man->CreateNtupleFColumn(1, "fPy_emitted");
-  man->CreateNtupleFColumn(1, "fPz_emitted");
-  man->CreateNtupleFColumn(1, "fKE_emitted");
-  man->CreateNtupleFColumn(1, "fX_hit");
-  man->CreateNtupleFColumn(1, "fY_hit");
-  man->CreateNtupleFColumn(1, "fZ_hit");
-  man->CreateNtupleFColumn(1, "fX_hit_TC");
-  man->CreateNtupleFColumn(1, "fY_hit_TC");
-  man->CreateNtupleFColumn(1, "fZ_hit_TC");
-  man->CreateNtupleFColumn(1, "fPx_hit");
-  man->CreateNtupleFColumn(1, "fPy_hit");
-  man->CreateNtupleFColumn(1, "fPz_hit");
-  man->CreateNtupleFColumn(1, "fKE_hit");
-  man->FinishNtuple(1);
-
-
+  // man->CreateNtuple("Primaries", "Primaries");
+  // man->CreateNtupleIColumn(1, "fEventID");
+  // man->CreateNtupleFColumn(1, "fX_emitted");
+  // man->CreateNtupleFColumn(1, "fY_emitted");
+  // man->CreateNtupleFColumn(1, "fZ_emitted");
+  // man->CreateNtupleFColumn(1, "fX_emitted_TC");
+  // man->CreateNtupleFColumn(1, "fY_emitted_TC");
+  // man->CreateNtupleFColumn(1, "fZ_emitted_TC");
+  // man->CreateNtupleFColumn(1, "fPx_emitted");
+  // man->CreateNtupleFColumn(1, "fPy_emitted");
+  // man->CreateNtupleFColumn(1, "fPz_emitted");
+  // man->CreateNtupleFColumn(1, "fKE_emitted");
+  // man->CreateNtupleFColumn(1, "fX_hit");
+  // man->CreateNtupleFColumn(1, "fY_hit");
+  // man->CreateNtupleFColumn(1, "fZ_hit");
+  // man->CreateNtupleFColumn(1, "fX_hit_TC");
+  // man->CreateNtupleFColumn(1, "fY_hit_TC");
+  // man->CreateNtupleFColumn(1, "fZ_hit_TC");
+  // man->CreateNtupleFColumn(1, "fPx_hit");
+  // man->CreateNtupleFColumn(1, "fPy_hit");
+  // man->CreateNtupleFColumn(1, "fPz_hit");
+  // man->CreateNtupleFColumn(1, "fKE_hit");
+  // man->FinishNtuple(1);
+    
+  // man->CreateNtuple("SD", "SD");
+  // man->CreateNtupleIColumn(1, "fEventID");
+  // man->CreateNtupleIColumn(1, "fTrackID");
+  // man->CreateNtupleSColumn(1, "fParticleName");
+  // man->CreateNtupleIColumn(1, "fPID");
+  // man->CreateNtupleFColumn(1, "fParticleMass");
+  // man->CreateNtupleIColumn(1, "outgoing_region");
+  // man->CreateNtupleFColumn(1, "fIntX");
+  // man->CreateNtupleFColumn(1, "fIntY");
+  // man->CreateNtupleFColumn(1, "fIntZ");
+  // man->CreateNtupleFColumn(1, "fPx");
+  // man->CreateNtupleFColumn(1, "fPy");
+  // man->CreateNtupleFColumn(1, "fPz");
+  // man->CreateNtupleFColumn(1, "fP");
+  // man->CreateNtupleFColumn(1, "fKE");
+  // man->CreateNtupleFColumn(1, "fTheta_P");
+  // man->CreateNtupleFColumn(1, "fPhi");
+  // man->CreateNtupleIColumn(1, "fParentID");
+  // man->CreateNtupleSColumn(1, "fCreatorProcess");
+  // man->FinishNtuple(1);
+  //}
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -227,13 +247,12 @@ void RunAction::EndOfRunAction(const G4Run* run)
          << " Energy = " << fEdep.GetValue()<< G4endl
          << "------------------------------------------------------------" << G4endl << G4endl;
 
-  G4cout << "Total hits: " << SensitiveDetector::allHits.size() << G4endl;
-
+  // Only master thread should handle ROOT file operations
+  //if (IsMaster()) {
   G4AnalysisManager *man = G4AnalysisManager::Instance();
-
-  SensitiveDetector::allHits.clear();
   man->Write();
   man->CloseFile();
+  //}
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

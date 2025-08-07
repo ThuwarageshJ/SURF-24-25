@@ -41,6 +41,7 @@ namespace B1
 
 void ActionInitialization::BuildForMaster() const
 {
+  // Master thread only handles run merging and ROOT file operations
   auto runAction = new RunAction;
   SetUserAction(runAction);
 }

@@ -61,6 +61,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     G4ThreeVector fTargetCenter = G4ThreeVector();
     G4bool fBiasingOn = false;
     G4double fTargetZ;
+    std::vector<G4LogicalVolume*> logicDetectors;
 
 };
 
